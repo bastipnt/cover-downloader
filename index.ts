@@ -112,7 +112,10 @@ const getReleaseCoverArt = async (
   return coverArt;
 };
 
-const downloadCoverArt = async (uri: string, album: string): string => {
+const downloadCoverArt = async (
+  uri: string,
+  album: string
+): Promise<string> => {
   // console.log(uri);
   const filename = album.replaceAll(" ", "-") + ".jpg";
 
