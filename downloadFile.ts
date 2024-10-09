@@ -1,9 +1,11 @@
 import { http, https } from "follow-redirects";
 import { writeFile } from "node:fs/promises";
+import { join, resolve } from "node:path";
+import type { TrackInfo } from "./types.js";
 
 const maxLength = 10; // 10mb
 
-export const download = (uri: string, path: string) =>
+const download = (uri: string, path: string) =>
   new Promise((resolve, reject) => {
     const httpFunction = uri.split(":")[0] === "https" ? https : http;
 
@@ -44,3 +46,16 @@ export const download = (uri: string, path: string) =>
       })
       .end();
   });
+
+export const downloadCoverArt = async (
+  trackInfo: TrackInfo
+): Promise<string | undefined> => {
+  if (!trackInfo.coverArtUri) return;
+
+  const { album, title } = trackInfo.metadata;
+  const filename = (album || title || "cover").replaceAll(" ", "-") + ".jpg";
+
+  const destination = resolve("./cover-art", filename);
+  await download(trackInfo.coverArtUri, destination);
+  return destination;
+};
