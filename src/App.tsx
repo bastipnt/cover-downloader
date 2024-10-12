@@ -35,7 +35,6 @@ function App() {
 
   useEffect(() => {
     if (!dragDropEvent) return;
-    // console.log(dragDropEvent);
 
     if (["enter", "over"].includes(dragDropEvent.payload.type))
       setIsDragOver(true);
@@ -52,11 +51,20 @@ function App() {
       >
         <h1>Drop your songs here</h1>
         {tracks.length > 0 && (
-          <ul>
-            {tracks.map(({ id, trackInfo }) => (
-              <li key={id}>
-                {trackInfo.artists.join(", ")} - {trackInfo.title} -{" "}
-                {trackInfo.album}
+          <ul className="track-list">
+            {tracks.map(({ id, trackInfo }, i) => (
+              <li key={id} className="track-list-item">
+                <span className="track-cover">
+                  {trackInfo.picture && (
+                    <img src={trackInfo.picture} alt="cover-picture" />
+                  )}
+                </span>
+                <span className="track-number">{i + 1}</span>
+                <span className="track-title">{trackInfo.title}</span>
+                <span className="track-album">{trackInfo.album}</span>
+                <span className="track-artists">
+                  {trackInfo.artists.join(", ")}
+                </span>
               </li>
             ))}
           </ul>

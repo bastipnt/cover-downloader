@@ -4,7 +4,7 @@ export type TrackInfo = {
   artists: string[];
   album?: string;
   title?: string;
-  picture?: IPicture[];
+  picture?: string;
 };
 
 export type UpdatedTrackInfo = TrackInfo & {

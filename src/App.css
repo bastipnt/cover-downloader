@@ -12,3 +12,53 @@
     background-color: #eee;
   }
 }
+
+.track-list {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+
+  .track-list-item {
+    display: grid;
+    padding: 0.5rem;
+    list-style: none;
+
+    align-items: center;
+    gap: 0.5rem 2rem;
+
+    grid-template-columns: auto 3rem 1fr 1fr;
+    grid-template-rows: auto;
+    grid-template-areas:
+      "number cover title album"
+      ". cover artists album";
+
+    &:not(:last-child) {
+      border-bottom: 1px solid #eee;
+    }
+
+    .track-number {
+      grid-area: number;
+    }
+
+    .track-title {
+      grid-area: title;
+    }
+
+    .track-album {
+      grid-area: album;
+    }
+
+    .track-artists {
+      grid-area: artists;
+    }
+
+    .track-cover {
+      grid-area: cover;
+
+      img {
+        width: 100%;
+      }
+    }
+  }
+}

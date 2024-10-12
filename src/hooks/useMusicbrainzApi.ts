@@ -15,10 +15,15 @@ const useMusicbrainzApi = () => {
   const analyzeTrack = async (trackPath: string): Promise<TrackInfo> => {
     const track = await readFile(trackPath);
     const metadata = await parseBuffer(track);
-    const { artists, picture, title, album } = metadata.common;
+    const { artists, picture: picturesData, title, album } = metadata.common;
 
-    // const fileName = trackPath.split("/").pop() || "";
-    // const folder = trackPath.match(/^(.+)(?:\/)/)?.[1] || "";
+    let picture: string | undefined = undefined;
+
+    if (picturesData && picturesData.length > 0) {
+      picture = URL.createObjectURL(
+        new Blob([picturesData[0].data], { type: "image/png" })
+      );
+    }
 
     return {
       artists: artists || [],
