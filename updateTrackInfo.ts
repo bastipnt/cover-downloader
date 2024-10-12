@@ -1,5 +1,5 @@
 import { join } from "node:path";
-import type { TrackInfo } from "./types.js";
+import type { TrackInfo } from "./src/types.js";
 
 export const addCoverArt = async (
   inputFolder: string,

@@ -1,7 +1,7 @@
 import { http, https } from "follow-redirects";
 import { writeFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
-import type { TrackInfo } from "./types.js";
+import type { TrackInfo } from "./src/types.js";
 
 const maxLength = 10; // 10mb
 

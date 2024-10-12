@@ -12,6 +12,9 @@
   },
   "dependencies": {
     "@tauri-apps/api": "^2.0.2",
+    "@tauri-apps/plugin-fs": "^2.0.0",
+    "music-metadata": "^10.5.0",
+    "musicbrainz-api": "^0.19.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },

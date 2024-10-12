@@ -1,10 +1,21 @@
-export type TrackInfo = {};
+import type { IPicture } from "music-metadata";
 
-export type UpdatedTrackInfo = TrackInfo & {};
+export type TrackInfo = {
+  artists: string[];
+  album?: string;
+  title?: string;
+  picture?: IPicture[];
+};
+
+export type UpdatedTrackInfo = TrackInfo & {
+  coverArtUri?: string;
+  coverArtPath?: string;
+};
 
 export type Track = {
   id: string;
-  path: string;
+  fileName: string;
+  folder: string;
   trackInfo: TrackInfo;
   updatedTrackInfo?: UpdatedTrackInfo;
 };

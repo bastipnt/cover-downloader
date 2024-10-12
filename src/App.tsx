@@ -3,20 +3,34 @@ import "./App.css";
 import { DragDropEventContext } from "./providers/dragDropEventProvider";
 import { TracksContext } from "./providers/tracksProvider";
 import { Track } from "./types";
+import useMusicbrainzApi from "./hooks/useMusicbrainzApi";
 
 function App() {
   const [isDragOver, setIsDragOver] = useState(false);
   const { dragDropEvent } = useContext(DragDropEventContext);
   const { tracks, addTracks } = useContext(TracksContext);
+  const { analyzeTrack } = useMusicbrainzApi();
 
-  const handleDrop = (paths: string[]) => {
-    const tracks = paths.map<Track>((path) => ({
-      id: crypto.randomUUID(),
-      path,
-      trackInfo: {},
-    }));
-    addTracks(tracks);
+  const handleDrop = async (paths: string[]) => {
     setIsDragOver(false);
+
+    const tracks: Track[] = [];
+
+    for (const path of paths) {
+      const fileName = path.split("/").pop() || "";
+      const folder = path.match(/^(.+)(?:\/)/)?.[1] || "";
+
+      const trackInfo = await analyzeTrack(path);
+
+      tracks.push({
+        id: crypto.randomUUID(),
+        trackInfo,
+        fileName,
+        folder,
+      });
+    }
+
+    addTracks(tracks);
   };
 
   useEffect(() => {
@@ -39,8 +53,11 @@ function App() {
         <h1>Drop your songs here</h1>
         {tracks.length > 0 && (
           <ul>
-            {tracks.map((track) => (
-              <li key={track.id}>{track.path}</li>
+            {tracks.map(({ id, trackInfo }) => (
+              <li key={id}>
+                {trackInfo.artists.join(", ")} - {trackInfo.title} -{" "}
+                {trackInfo.album}
+              </li>
             ))}
           </ul>
         )}

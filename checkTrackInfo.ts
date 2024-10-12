@@ -4,7 +4,7 @@ import {
   CoverArtArchiveApi,
   type ICoverInfo,
 } from "musicbrainz-api";
-import type { TrackInfo } from "./types.js";
+import type { TrackInfo } from "./src/types.js";
 import { parseFile } from "music-metadata";
 
 const mbApi = new MusicBrainzApi({

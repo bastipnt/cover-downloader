@@ -37,6 +37,9 @@ test("lists added tracks", async () => {
 
   expect(screen.queryAllByRole("listitem").length).toBe(1);
   expect(screen.getByText(/track.mp3/));
+  expect(screen.getByText(/Artist1/));
+  expect(screen.getByText(/Artist2/));
+  expect(screen.getByText(/Album1/));
 });
 
 test("shows drag overlay on dragEnter", () => {
@@ -78,7 +81,7 @@ test("hides drag overlay on dragLeave", () => {
   expect(screen.getByTestId("dragArea").classList).not.toContain("dragOver");
 });
 
-test("hides drag overlay on dragDrop", () => {
+test("hides drag overlay on dragDrop", async () => {
   expect(screen.getByTestId("dragArea").classList).toContain("dragArea");
   expect(screen.getByTestId("dragArea").classList).not.toContain("dragOver");
 
@@ -91,6 +94,11 @@ test("hides drag overlay on dragDrop", () => {
   act(() => {
     dispatchDragDropEvent(TauriEvent.DRAG_DROP);
   });
+
+  // already hides before analyzing tracks
+  expect(screen.getByTestId("dragArea").classList).not.toContain("dragOver");
+
+  await screen.findByRole("list");
 
   expect(screen.getByTestId("dragArea").classList).not.toContain("dragOver");
 });
