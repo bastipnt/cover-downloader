@@ -2,17 +2,20 @@ name: Runs frontend tests
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
 
 jobs:
-  build:
-    name: test
+  test:
+    name: test frontend
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v2
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
+
       - name: Execute Integration tests
-      - run: bun run test
+        run: bun run test
