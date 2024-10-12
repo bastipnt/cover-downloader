@@ -10,7 +10,6 @@ function App() {
   const { tracks, addTracks } = useContext(TracksContext);
 
   const handleDrop = (paths: string[]) => {
-    console.log(paths);
     const tracks = paths.map<Track>((path) => ({
       id: crypto.randomUUID(),
       path,
