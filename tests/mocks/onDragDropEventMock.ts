@@ -2,10 +2,7 @@ import { LogicalPosition } from "@tauri-apps/api/dpi";
 import { Event, TauriEvent, UnlistenFn } from "@tauri-apps/api/event";
 import { DragDropEvent } from "@tauri-apps/api/webviewWindow";
 import { vi } from "vitest";
-
-declare global {
-  const dragDropCallbackFns: ((e: Event<DragDropEvent>) => void)[];
-}
+import { MockTrack } from "./mock-types";
 
 const createEvent = (eventType: TauriEvent): Event<DragDropEvent> => {
   if (eventType === TauriEvent.DRAG_DROP) {
@@ -13,7 +10,7 @@ const createEvent = (eventType: TauriEvent): Event<DragDropEvent> => {
       id: Object.values(TauriEvent).indexOf(eventType),
       event: eventType,
       payload: {
-        paths: ["mock-path/track.mp3"],
+        paths: mockTracks.map(({ path }) => path),
         position: {
           type: "physical",
           x: 0,
@@ -28,7 +25,7 @@ const createEvent = (eventType: TauriEvent): Event<DragDropEvent> => {
       id: Object.values(TauriEvent).indexOf(eventType),
       event: eventType,
       payload: {
-        paths: ["mock-path/track.mp3"],
+        paths: mockTracks.map(({ path }) => path),
         position: {
           type: "physical",
           x: 0,
@@ -63,7 +60,9 @@ const createEvent = (eventType: TauriEvent): Event<DragDropEvent> => {
   }
 };
 
-export const mockOnDragDropEvent = async () => {
+export const mockOnDragDropEvent = async (tracks: MockTrack[]) => {
+  vi.stubGlobal("mockTracks", tracks);
+
   vi.mock("@tauri-apps/api/webview", () => {
     vi.stubGlobal("dragDropCallbackFns", []);
 
