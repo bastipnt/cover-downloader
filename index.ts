@@ -5,7 +5,7 @@ import { checkTrackInfo } from "./checkTrackInfo.ts";
 import { updateTrackInfo } from "./updateTrackInfo.ts";
 
 const ONLY_ONE = false;
-const MUSIC_FOLDER = "/Users/basti/Music/Downloads/old";
+const MUSIC_FOLDER = "/<folder>";
 
 const listFiles = async (): Promise<string[]> => {
   const files = await readdir(MUSIC_FOLDER);
