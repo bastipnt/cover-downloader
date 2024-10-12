@@ -7,12 +7,11 @@ import {
 import App from "./App";
 import DragDropEventProvider from "./providers/dragDropEventProvider";
 import TracksProvider from "./providers/tracksProvider";
+import { TauriEvent } from "@tauri-apps/api/event";
 
 beforeEach(() => {
   mockOnDragDropEvent();
-});
 
-test("lists added tracks", async () => {
   act(() => {
     render(
       <DragDropEventProvider>
@@ -22,17 +21,76 @@ test("lists added tracks", async () => {
       </DragDropEventProvider>
     );
   });
+});
 
+test("lists added tracks", async () => {
   // screen.debug();
 
-  expect(await screen.queryAllByRole("list").length).toBe(0);
+  expect(screen.queryAllByRole("list").length).toBe(0);
+  expect(screen.queryAllByRole("listitem").length).toBe(0);
 
   act(() => {
-    dispatchDragDropEvent();
+    dispatchDragDropEvent(TauriEvent.DRAG_DROP);
   });
 
   await screen.findByRole("list");
 
-  expect(await screen.queryAllByRole("list").length).toBe(1);
+  expect(screen.queryAllByRole("listitem").length).toBe(1);
   expect(screen.getByText(/track.mp3/));
+});
+
+test("shows drag overlay on dragEnter", () => {
+  expect(screen.getByTestId("dragArea").classList).toContain("dragArea");
+  expect(screen.getByTestId("dragArea").classList).not.toContain("dragOver");
+
+  act(() => {
+    dispatchDragDropEvent(TauriEvent.DRAG_ENTER);
+  });
+
+  expect(screen.getByTestId("dragArea").classList).toContain("dragOver");
+});
+
+test("shows drag overlay on dragOver", () => {
+  expect(screen.getByTestId("dragArea").classList).toContain("dragArea");
+  expect(screen.getByTestId("dragArea").classList).not.toContain("dragOver");
+
+  act(() => {
+    dispatchDragDropEvent(TauriEvent.DRAG_OVER);
+  });
+
+  expect(screen.getByTestId("dragArea").classList).toContain("dragOver");
+});
+
+test("hides drag overlay on dragLeave", () => {
+  expect(screen.getByTestId("dragArea").classList).toContain("dragArea");
+  expect(screen.getByTestId("dragArea").classList).not.toContain("dragOver");
+
+  act(() => {
+    dispatchDragDropEvent(TauriEvent.DRAG_ENTER);
+  });
+
+  expect(screen.getByTestId("dragArea").classList).toContain("dragOver");
+
+  act(() => {
+    dispatchDragDropEvent(TauriEvent.DRAG_LEAVE);
+  });
+
+  expect(screen.getByTestId("dragArea").classList).not.toContain("dragOver");
+});
+
+test("hides drag overlay on dragDrop", () => {
+  expect(screen.getByTestId("dragArea").classList).toContain("dragArea");
+  expect(screen.getByTestId("dragArea").classList).not.toContain("dragOver");
+
+  act(() => {
+    dispatchDragDropEvent(TauriEvent.DRAG_ENTER);
+  });
+
+  expect(screen.getByTestId("dragArea").classList).toContain("dragOver");
+
+  act(() => {
+    dispatchDragDropEvent(TauriEvent.DRAG_DROP);
+  });
+
+  expect(screen.getByTestId("dragArea").classList).not.toContain("dragOver");
 });

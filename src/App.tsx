@@ -21,6 +21,7 @@ function App() {
 
   useEffect(() => {
     if (!dragDropEvent) return;
+    // console.log(dragDropEvent);
 
     if (["enter", "over"].includes(dragDropEvent.payload.type))
       setIsDragOver(true);
@@ -31,7 +32,10 @@ function App() {
 
   return (
     <>
-      <div className={`dragArea ${isDragOver ? "dragOver" : ""}`}>
+      <div
+        data-testid="dragArea"
+        className={`dragArea ${isDragOver ? "dragOver" : ""}`}
+      >
         <h1>Drop your songs here</h1>
         {tracks.length > 0 && (
           <ul>
