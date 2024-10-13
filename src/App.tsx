@@ -8,8 +8,8 @@ import useMusicbrainzApi from "./hooks/useMusicbrainzApi";
 function App() {
   const [isDragOver, setIsDragOver] = useState(false);
   const { dragDropEvent } = useContext(DragDropEventContext);
-  const { tracks, addTracks } = useContext(TracksContext);
-  const { analyzeTrack } = useMusicbrainzApi();
+  const { tracks, addTracks, updateTrack } = useContext(TracksContext);
+  const { analyzeTrack, getOnlineTrackInfo } = useMusicbrainzApi();
 
   const handleDrop = async (paths: string[]) => {
     setIsDragOver(false);
@@ -33,6 +33,15 @@ function App() {
     addTracks(tracks);
   };
 
+  const handleGetOnlineInfo = async () => {
+    for (const track of tracks) {
+      const updatedTrackInfo = await getOnlineTrackInfo(track.trackInfo);
+
+      if (!updatedTrackInfo) continue;
+      updateTrack(track.id, updatedTrackInfo);
+    }
+  };
+
   useEffect(() => {
     if (!dragDropEvent) return;
 
@@ -50,20 +59,30 @@ function App() {
         className={`dragArea ${isDragOver ? "dragOver" : ""}`}
       >
         <h1>Drop your songs here</h1>
+        <button onClick={handleGetOnlineInfo}>Get online info</button>
         {tracks.length > 0 && (
           <ul className="track-list">
-            {tracks.map(({ id, trackInfo }, i) => (
+            {tracks.map(({ id, trackInfo, updatedTrackInfo }, i) => (
               <li key={id} className="track-list-item">
                 <span className="track-cover">
                   {trackInfo.picture && (
-                    <img src={trackInfo.picture} alt="cover-picture" />
+                    <img
+                      src={trackInfo.picture}
+                      alt={`cover picture - ${trackInfo.title}`}
+                    />
                   )}
                 </span>
                 <span className="track-number">{i + 1}</span>
-                <span className="track-title">{trackInfo.title}</span>
-                <span className="track-album">{trackInfo.album}</span>
+                <span className="track-title">
+                  {updatedTrackInfo?.title || trackInfo.title}
+                </span>
+                <span className="track-album">
+                  {updatedTrackInfo?.album || trackInfo.album}
+                </span>
                 <span className="track-artists">
-                  {trackInfo.artists.join(", ")}
+                  {updatedTrackInfo?.artists
+                    ? updatedTrackInfo.artists.join(", ")
+                    : trackInfo.artists.join(", ")}
                 </span>
               </li>
             ))}

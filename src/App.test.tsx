@@ -1,5 +1,5 @@
 import { beforeEach, expect, test } from "vitest";
-import { act, render, screen, within } from "@testing-library/react";
+import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import {
   mockOnDragDropEvent,
   dispatchDragDropEvent,
@@ -8,7 +8,8 @@ import App from "./App";
 import DragDropEventProvider from "./providers/dragDropEventProvider";
 import TracksProvider from "./providers/tracksProvider";
 import { TauriEvent } from "@tauri-apps/api/event";
-import { MockTrack } from "../tests/mocks/mock-types";
+import { MockOnlineTrack, MockTrack } from "../tests/mocks/mock-types";
+import { mockMusicBrainzApiTracks } from "../tests/mocks/musicBrainzApiMock";
 
 const tracks: MockTrack[] = [
   {
@@ -20,11 +21,29 @@ const tracks: MockTrack[] = [
   {
     path: "/songs/track2.mp3",
     title: "track2",
-    album: "album2",
     artists: ["artist2a", "artist2b"],
   },
   {
     path: "/songs/track3.mp3",
+    title: "trAcK3",
+    artists: ["artist3a", "aRtIst3b"],
+  },
+];
+
+const onlineTracks: MockOnlineTrack[] = [
+  {
+    title: "track1",
+    album: "album1",
+    artists: ["artist1a", "artist1b"],
+    pictureUrl: "picture-url-1",
+  },
+  {
+    title: "track2",
+    album: "album2",
+    artists: ["artist2a", "artist2b"],
+    pictureUrl: "picture-url-2",
+  },
+  {
     title: "track3",
     album: "album3",
     artists: ["artist3a", "artist3b"],
@@ -33,6 +52,7 @@ const tracks: MockTrack[] = [
 
 beforeEach(() => {
   mockOnDragDropEvent(tracks);
+  mockMusicBrainzApiTracks(onlineTracks);
 
   act(() => {
     render(
@@ -62,9 +82,39 @@ test("lists added tracks", async () => {
   const listItems = screen.getAllByRole("listitem");
 
   tracks.forEach((track, i) => {
+    expect(
+      within(listItems[i]).getAllByAltText(`cover picture - ${track.title}`)
+    );
     expect(within(listItems[i]).getByText(track.title));
-    expect(within(listItems[i]).getByText(track.album));
+    if (track.album) expect(within(listItems[i]).getByText(track.album));
     expect(within(listItems[i]).getByText(track.artists.join(", ")));
+  });
+});
+
+test("lists updated track information", async () => {
+  act(() => {
+    dispatchDragDropEvent(TauriEvent.DRAG_DROP);
+  });
+
+  await screen.findByRole("list");
+
+  fireEvent.click(screen.getByText("Get online info"));
+
+  const listItems = screen.getAllByRole("listitem");
+
+  if (!onlineTracks[1].album) throw new Error("Test setup is wrong");
+  expect(await within(listItems[1]).findByText(onlineTracks[1].album));
+
+  if (!onlineTracks[2].album) throw new Error("Test setup is wrong");
+  expect(await within(listItems[2]).findByText(onlineTracks[2].album));
+
+  tracks.forEach((_, i) => {
+    const onlineTrack = onlineTracks[i];
+
+    expect(within(listItems[i]).getByText(onlineTrack.title));
+    if (onlineTrack.album)
+      expect(within(listItems[i]).getByText(onlineTrack.album));
+    expect(within(listItems[i]).getByText(onlineTrack.artists.join(", ")));
   });
 });
 
