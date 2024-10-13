@@ -65,11 +65,18 @@ function App() {
             {tracks.map(({ id, trackInfo, updatedTrackInfo }, i) => (
               <li key={id} className="track-list-item">
                 <span className="track-cover">
-                  {trackInfo.picture && (
+                  {trackInfo.picture ? (
                     <img
                       src={trackInfo.picture}
                       alt={`cover picture - ${trackInfo.title}`}
                     />
+                  ) : (
+                    updatedTrackInfo?.coverArtUri && (
+                      <img
+                        src={updatedTrackInfo.coverArtUri}
+                        alt={`cover picture - ${trackInfo.title}`}
+                      />
+                    )
                   )}
                 </span>
                 <span className="track-number">{i + 1}</span>

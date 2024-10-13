@@ -9,6 +9,7 @@ export type MockTrack = {
   album?: string;
   artists: string[];
   path: string;
+  picture: boolean;
 };
 
 export type MockOnlineTrack = {

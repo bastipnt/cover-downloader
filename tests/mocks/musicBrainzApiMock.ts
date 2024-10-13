@@ -2,6 +2,8 @@ import { vi } from "vitest";
 import {
   AreaIncludes,
   IArtistCredit,
+  ICoverInfo,
+  IImage,
   ILinkedEntitiesArea,
   IRecordingList,
   IRecordingMatch,
@@ -36,12 +38,22 @@ export const mockMusicBrainzApi = () => {
         if (!onlineTrack) return;
 
         const release = {
-          id: crypto.randomUUID(),
+          id: `${onlineTrack.album}-id`,
           title: onlineTrack.album || "",
         } as IRelease;
 
+        if (onlineTrack.pictureUrl) {
+          release["cover-art-archive"] = {
+            artwork: true,
+            back: false,
+            front: true,
+            count: 1,
+            darkened: false,
+          };
+        }
+
         const recording: IRecordingMatch = {
-          id: crypto.randomUUID(),
+          id: `${onlineTrack.title}-id`,
           disambiguation: "test",
           length: 1,
           score: 0.6,
@@ -66,7 +78,41 @@ export const mockMusicBrainzApi = () => {
       }
     }
 
-    return { MusicBrainzApi };
+    class CoverArtArchiveApi {
+      async getReleaseCovers(releaseId: string): Promise<ICoverInfo> {
+        const album = releaseId.split("-")[0];
+        if (!album)
+          return {
+            images: [],
+            release: releaseId,
+          };
+
+        const onlineTrack = mockOnlineTracks.find(
+          ({ album: a }) => a === album
+        );
+
+        if (!onlineTrack || !onlineTrack.pictureUrl) {
+          return {
+            images: [],
+            release: releaseId,
+          };
+        }
+
+        return {
+          images: [
+            {
+              front: true,
+              thumbnails: {
+                "500": onlineTrack.pictureUrl,
+              } as IImage["thumbnails"],
+            } as IImage,
+          ],
+          release: releaseId,
+        };
+      }
+    }
+
+    return { MusicBrainzApi, CoverArtArchiveApi };
   });
 };
 

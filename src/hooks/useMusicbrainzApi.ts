@@ -2,7 +2,7 @@
 import { parseBuffer } from "music-metadata";
 import { TrackInfo, UpdatedTrackInfo } from "../types";
 import { readFile } from "@tauri-apps/plugin-fs";
-import { MusicBrainzApi } from "musicbrainz-api";
+import { CoverArtArchiveApi, MusicBrainzApi } from "musicbrainz-api";
 
 const mbApi = new MusicBrainzApi({
   appName: "my-app",
@@ -10,7 +10,13 @@ const mbApi = new MusicBrainzApi({
   appContactInfo: "user@mail.org",
 });
 
-// const coverArtArchiveApiClient = new CoverArtArchiveApi();
+const coverArtArchiveApiClient = new CoverArtArchiveApi();
+
+const getArtists = (artists?: string[]) =>
+  (artists || [])
+    .reduce((artists: string[], curr) => [...artists, ...curr.split(",")], [])
+    .map((artist) => artist.trim())
+    .filter((artist, index, artists) => artists.indexOf(artist) === index);
 
 const useMusicbrainzApi = () => {
   const analyzeTrack = async (trackPath: string): Promise<TrackInfo> => {
@@ -27,7 +33,7 @@ const useMusicbrainzApi = () => {
     }
 
     return {
-      artists: artists || [],
+      artists: getArtists(artists),
       album,
       picture,
       title,
@@ -39,12 +45,14 @@ const useMusicbrainzApi = () => {
   ): Promise<UpdatedTrackInfo | undefined> => {
     const { title, artists } = trackInfo;
 
+    const query = {
+      title,
+      artist: artists.join(" & "),
+    };
+
     // @ts-ignore
     const recordingList = await mbApi.search("recording", {
-      query: {
-        title,
-        artist: artists.join(" & "),
-      },
+      query,
       limit: 1,
     });
 
@@ -73,10 +81,23 @@ const useMusicbrainzApi = () => {
       updatedArtists = artists;
     }
 
+    let coverArtUri;
+
+    const coverInfo = await coverArtArchiveApiClient.getReleaseCovers(
+      release.id
+    );
+
+    if (coverInfo && coverInfo.images.length > 0) {
+      const frontImage = coverInfo.images.find(({ front }) => front);
+      if (frontImage) coverArtUri = frontImage.thumbnails[500];
+      else coverArtUri = coverInfo.images[0].thumbnails[500];
+    }
+
     return {
       artists: updatedArtists,
       album,
       title: updatedTitle,
+      coverArtUri,
     };
   };
 

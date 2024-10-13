@@ -18,18 +18,19 @@ export const mockMusicMetadata = () => {
 
   vi.mock("music-metadata", () => {
     const parseBuffer = async (file: Uint8Array): Promise<IAudioMetadata> => {
-      const { title, artists, album } = JSON.parse(
+      const { title, artists, album, picture } = JSON.parse(
         new TextDecoder().decode(file)
       ) as MockTrack;
 
-      const picture: IPicture[] = [{ data: new Uint8Array(), format: "" }];
+      const pictures: IPicture[] = [];
+      if (picture) pictures.push({ data: new Uint8Array(), format: "" });
 
       return {
         common: {
           artists,
           title,
           album,
-          picture,
+          picture: pictures,
           disk: { no: 1, of: 1 },
           track: { no: 1, of: 3 },
           movementIndex: { no: 2, of: 4 },

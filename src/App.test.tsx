@@ -17,16 +17,19 @@ const tracks: MockTrack[] = [
     title: "track1",
     album: "album1",
     artists: ["artist1a", "artist1b"],
+    picture: true,
   },
   {
     path: "/songs/track2.mp3",
     title: "track2",
     artists: ["artist2a", "artist2b"],
+    picture: false,
   },
   {
     path: "/songs/track3.mp3",
     title: "trAcK3",
     artists: ["artist3a", "aRtIst3b"],
+    picture: false,
   },
 ];
 
@@ -83,8 +86,9 @@ test("lists added tracks", async () => {
 
   tracks.forEach((track, i) => {
     expect(
-      within(listItems[i]).getAllByAltText(`cover picture - ${track.title}`)
-    );
+      within(listItems[i]).queryAllByAltText(`cover picture - ${track.title}`)
+        .length
+    ).toBe(track.picture ? 1 : 0);
     expect(within(listItems[i]).getByText(track.title));
     if (track.album) expect(within(listItems[i]).getByText(track.album));
     expect(within(listItems[i]).getByText(track.artists.join(", ")));
@@ -98,7 +102,9 @@ test("lists updated track information", async () => {
 
   await screen.findByRole("list");
 
-  fireEvent.click(screen.getByText("Get online info"));
+  act(() => {
+    fireEvent.click(screen.getByText("Get online info"));
+  });
 
   const listItems = screen.getAllByRole("listitem");
 
@@ -107,6 +113,22 @@ test("lists updated track information", async () => {
 
   if (!onlineTracks[2].album) throw new Error("Test setup is wrong");
   expect(await within(listItems[2]).findByText(onlineTracks[2].album));
+
+  expect(
+    within(listItems[0]).getByAltText(
+      `cover picture - ${onlineTracks[0].title}`
+    )
+  );
+  expect(
+    within(listItems[1]).getByAltText(
+      `cover picture - ${onlineTracks[1].title}`
+    )
+  );
+  expect(
+    within(listItems[2]).queryAllByAltText(
+      `cover picture - ${onlineTracks[2].title}`
+    ).length
+  ).toBe(0);
 
   tracks.forEach((_, i) => {
     const onlineTrack = onlineTracks[i];
