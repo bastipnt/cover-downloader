@@ -52,7 +52,7 @@ function App() {
       const isUpdated = await downloadTrackInfo(track);
       const res = await updateTrackLocally(track);
 
-      console.log({ res });
+      // console.log({ res });
 
       if (!isUpdated) continue;
       const updatedTrack: Track = { ...track, state: TrackState.FINISHED };

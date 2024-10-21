@@ -42,8 +42,6 @@ const useUpdateTrackLocally = () => {
     command += ` ${outputPath}`;
 
     let res = await Command.create("exec-sh", ["-c", command]).execute();
-    console.log(command);
-    console.log(res);
     return res;
   };
 

@@ -44,8 +44,7 @@ const updatedTrack = {
 describe("updateTrack", () => {
   test("it calls the update track function in the backend with the correct values", async () => {
     const { updateTrackLocally } = useUpdateTrackLocally();
-    const command =
-      "ffmpeg -hide_banner -loglevel error -y -i 'music/tracks/track1.mp3' -i /Users/basti/Projekte/repositories/cover-downloader/cover-art/album1.jpg -c copy -map 0 -map 1 -metadata title='titleee' -metadata album='album-updated1' -metadata artist='Artist1, Artist2' 'music/outputs/tracks/track1.mp3'";
+    const command = `ffmpeg -hide_banner -loglevel error -y -i 'music/tracks/track1.mp3' -i ${process.cwd()}/cover-art/album1.jpg -c copy -map 0 -map 1 -metadata title='titleee' -metadata album='album-updated1' -metadata artist='Artist1, Artist2' 'music/outputs/tracks/track1.mp3'`;
     await updateTrackLocally(updatedTrack);
     expect(Command.create).toHaveBeenCalledWith("exec-sh", ["-c", command]);
   });
