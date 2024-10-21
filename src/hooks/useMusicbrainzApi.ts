@@ -83,14 +83,18 @@ const useMusicbrainzApi = () => {
 
     let coverArtUri;
 
-    const coverInfo = await coverArtArchiveApiClient.getReleaseCovers(
-      release.id
-    );
+    try {
+      const coverInfo = await coverArtArchiveApiClient.getReleaseCovers(
+        release.id
+      );
 
-    if (coverInfo && coverInfo.images.length > 0) {
-      const frontImage = coverInfo.images.find(({ front }) => front);
-      if (frontImage) coverArtUri = frontImage.thumbnails[500];
-      else coverArtUri = coverInfo.images[0].thumbnails[500];
+      if (coverInfo && coverInfo.images.length > 0) {
+        const frontImage = coverInfo.images.find(({ front }) => front);
+        if (frontImage) coverArtUri = frontImage.thumbnails[500];
+        else coverArtUri = coverInfo.images[0].thumbnails[500];
+      }
+    } catch (error) {
+      console.log("Error downloading cover art", error);
     }
 
     return {

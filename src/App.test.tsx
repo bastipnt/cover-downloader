@@ -10,6 +10,7 @@ import TracksProvider from "./providers/tracksProvider";
 import { TauriEvent } from "@tauri-apps/api/event";
 import { MockOnlineTrack, MockTrack } from "../tests/mocks/mock-types";
 import { mockMusicBrainzApiTracks } from "../tests/mocks/musicBrainzApiMock";
+import { TrackState } from "./types.d";
 
 const tracks: MockTrack[] = [
   {
@@ -199,4 +200,27 @@ test("hides drag overlay on dragDrop", async () => {
   await screen.findByRole("list");
 
   expect(screen.getByTestId("dragArea").classList).not.toContain("dragOver");
+});
+
+test("shows update finished indicator after updating", async () => {
+  act(() => {
+    dispatchDragDropEvent(TauriEvent.DRAG_DROP);
+  });
+
+  await screen.findByRole("list");
+
+  act(() => {
+    fireEvent.click(screen.getByText("Get online info"));
+  });
+
+  const album = onlineTracks[1].album;
+  if (!album) throw new Error("Something went wrong in the test setup");
+
+  await screen.findByText(album);
+
+  act(() => {
+    fireEvent.click(screen.getByText("Update Track"));
+  });
+
+  await screen.findByTestId(TrackState.FINISHED);
 });

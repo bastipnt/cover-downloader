@@ -3,5 +3,24 @@
   "identifier": "default",
   "description": "enables the default permissions",
   "windows": ["main"],
-  "permissions": ["core:default", "fs:allow-home-read"]
+  "permissions": [
+    "core:default",
+    "fs:allow-home-read",
+    "shell:default",
+    {
+      "identifier": "shell:allow-execute",
+      "allow": [
+        {
+          "name": "exec-sh",
+          "cmd": "sh",
+          "args": [
+            "-c",
+            {
+              "validator": ".+"
+            }
+          ]
+        }
+      ]
+    }
+  ]
 }

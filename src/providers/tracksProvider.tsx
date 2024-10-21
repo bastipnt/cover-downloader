@@ -1,10 +1,10 @@
 import { ReactNode, createContext, useState } from "react";
-import { Track, UpdatedTrackInfo } from "../types";
+import { Track } from "../types";
 
 export const TracksContext = createContext<{
   tracks: Track[];
   addTracks: (tracks: Track[]) => void;
-  updateTrack: (trackId: string, updatedTrackInfo: UpdatedTrackInfo) => void;
+  updateTrack: (updatedTrack: Track) => void;
   clearTracks: () => void;
 }>({
   tracks: [],
@@ -25,14 +25,14 @@ const TracksProvider: React.FC<Props> = ({ children }) => {
 
   const clearTracks = () => setTracks([]);
 
-  const updateTrack = (trackId: string, updatedTrackInfo: UpdatedTrackInfo) => {
-    const trackIndex = tracks.findIndex(({ id }) => id === trackId);
+  const updateTrack = (updatedTrack: Track) => {
+    const trackIndex = tracks.findIndex(({ id }) => id === updatedTrack.id);
     if (trackIndex === -1) return;
 
-    setTracks((oldTracks) => {
-      const updatedTracks = [...oldTracks];
+    setTracks((tracks) => {
+      const updatedTracks = [...tracks];
 
-      updatedTracks[trackIndex].updatedTrackInfo = updatedTrackInfo;
+      updatedTracks[trackIndex] = updatedTrack;
 
       return updatedTracks;
     });
