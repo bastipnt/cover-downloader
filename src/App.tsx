@@ -5,6 +5,7 @@ import { TracksContext } from "./providers/tracksProvider";
 import { Track, TrackState } from "./types.d";
 import useMusicbrainzApi from "./hooks/useMusicbrainzApi";
 import useUpdateTrackLocally from "./hooks/useUpdateTrackLocally";
+import CoverArt from "./components/CoverArt";
 
 function App() {
   const [isDragOver, setIsDragOver] = useState(false);
@@ -75,37 +76,38 @@ function App() {
         <button onClick={handleGetOnlineInfo}>Get online info</button>
         <button onClick={handleDownloadTrackInfo}>Update Track</button>
         {tracks.length > 0 && (
-          <ul className="track-list">
-            {tracks.map(({ id, trackInfo, updatedTrackInfo, state }, i) => (
-              <li key={id} className="track-list-item">
-                <span className="track-cover">
-                  {trackInfo.picture ? (
-                    <img src={trackInfo.picture} alt={`cover picture - ${trackInfo.title}`} />
-                  ) : (
-                    updatedTrackInfo?.coverArtUri && (
-                      <img
-                        src={updatedTrackInfo.coverArtUri}
-                        alt={`cover picture - ${trackInfo.title}`}
-                      />
-                    )
-                  )}
-                </span>
-                <span className="track-number">{i + 1}</span>
-                <span className="track-title">{updatedTrackInfo?.title || trackInfo.title}</span>
-                <span className="track-album">{updatedTrackInfo?.album || trackInfo.album}</span>
-                <span className="track-artists">
-                  {updatedTrackInfo?.artists
-                    ? updatedTrackInfo.artists.join(", ")
-                    : trackInfo.artists.join(", ")}
-                </span>
-                {state === TrackState.FINISHED && (
-                  <span data-testid={TrackState.FINISHED} className={TrackState.FINISHED}>
-                    ✅
+          <>
+            <div className="track-list-header">
+              <span className="track-number">#</span>
+              <span className="track-title">Title</span>
+              <span className="track-artists">Artists</span>
+              <span className="track-album">Album</span>
+            </div>
+            <ul className="track-list">
+              {tracks.map(({ id, trackInfo, updatedTrackInfo, state }, i) => (
+                <li key={id} className="track-list-item">
+                  <CoverArt
+                    src={trackInfo.picture || updatedTrackInfo?.coverArtUri}
+                    title={trackInfo.title}
+                    className="track-cover"
+                  />
+                  <span className="track-number">{i + 1}</span>
+                  <span className="track-title">{updatedTrackInfo?.title || trackInfo.title}</span>
+                  <span className="track-album">{updatedTrackInfo?.album || trackInfo.album}</span>
+                  <span className="track-artists">
+                    {updatedTrackInfo?.artists
+                      ? updatedTrackInfo.artists.join(", ")
+                      : trackInfo.artists.join(", ")}
                   </span>
-                )}
-              </li>
-            ))}
-          </ul>
+                  {state === TrackState.FINISHED && (
+                    <span data-testid={TrackState.FINISHED} className={TrackState.FINISHED}>
+                      ✅
+                    </span>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </>
         )}
       </div>
     </>
