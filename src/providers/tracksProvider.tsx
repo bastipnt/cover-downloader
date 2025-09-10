@@ -1,5 +1,5 @@
 import { ReactNode, createContext, useState } from "react";
-import { Track } from "../types";
+import { Track, TrackState } from "../types.d";
 
 export const TracksContext = createContext<{
   tracks: Track[];
@@ -21,7 +21,18 @@ const TracksProvider: React.FC<Props> = ({ children }) => {
   const [tracks, setTracks] = useState<Track[]>([]);
 
   const addTracks = (newTracks: Track[]) =>
-    setTracks((prevTracks) => [...prevTracks, ...newTracks]);
+    setTracks((oldTracks) => {
+      if (oldTracks.some(({ state }) => state === TrackState.UPDATING)) return oldTracks;
+
+      return newTracks.reduce((prevTracks, currentTrack) => {
+        const { folder: fol, fileName: fiN } = currentTrack;
+
+        if (prevTracks.some(({ folder, fileName }) => fiN === fileName && fol === folder))
+          return prevTracks;
+
+        return [...prevTracks, currentTrack];
+      }, oldTracks);
+    });
 
   const clearTracks = () => setTracks([]);
 

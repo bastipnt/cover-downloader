@@ -60,8 +60,8 @@ const createEvent = (eventType: TauriEvent): Event<DragDropEvent> => {
   }
 };
 
-export const mockOnDragDropEvent = async (tracks: MockTrack[]) => {
-  vi.stubGlobal("mockTracks", tracks);
+export const mockOnDragDropEvent = async () => {
+  vi.stubGlobal("mockTracks", []);
 
   vi.mock("@tauri-apps/api/webview", () => {
     vi.stubGlobal("dragDropCallbackFns", []);
@@ -81,6 +81,7 @@ export const mockOnDragDropEvent = async (tracks: MockTrack[]) => {
   });
 };
 
-export const dispatchDragDropEvent = (eventType: TauriEvent) => {
+export const dispatchDragDropEvent = (eventType: TauriEvent, tracks: MockTrack[]) => {
+  mockTracks = tracks;
   dragDropCallbackFns.forEach((fn) => fn(createEvent(eventType)));
 };
